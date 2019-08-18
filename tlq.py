@@ -3,7 +3,7 @@ import copy
 
 row = 10
 col = 4
-max_elm_equal = 3
+max_elm_equal = 2
 
 combines = list(itertools.combinations(list(range(2, row + 1)), col - 1))
 
@@ -34,18 +34,17 @@ def fill_matrix(matrix, combine):
 def update_matrix(matrix, combine, row, col):
         num_rows = len(matrix)
         num_cols = len(matrix[0])
-        if row == num_rows-1 and col == num_cols:
-                result.append(copy.deepcopy(matrix))
 
-        if col == num_cols:
+        if col == num_cols or row == num_rows:
                 return
         selectables = set(range(1, num_rows+1))
-        selected_in_cols = set([row[col] for row in matrix[0:row]])
+        selected_in_cols = set([rows[col] for rows in matrix[0:row]])
         selected_in_rows = set(matrix[row][0:col])
         selectables = selectables - (selected_in_cols | selected_in_rows)
 
         for selectable in sorted(selectables, reverse=True):
                 selected_in_rows.add(selectable)
+                
                 valid = True
                 for selected_row in matrix[0:row]:
                         intersection = selected_in_rows & set(selected_row)
@@ -53,13 +52,13 @@ def update_matrix(matrix, combine, row, col):
                                 valid = False
                                 break
                                      
-                selected_in_rows.discard(selectable)                
                 if valid:
                         matrix[row][col] = selectable
-                else:
-                        matrix[row][col] = 0
-                update_matrix(matrix, combine, row, col + 1)
-
+                        if row == num_rows-1 and col == num_cols-1:
+                                result.append(copy.deepcopy(matrix))
+                        update_matrix(matrix, combine, row, col + 1)
+                selected_in_rows.discard(selectable)                
+                
 for c in combines:
         fill_matrix(matrix, c)
 
