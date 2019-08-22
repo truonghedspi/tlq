@@ -1,9 +1,9 @@
 import itertools
 import copy
 
-row = 10
-col = 4
-max_elm_equal = 2
+row = 80
+col = 5
+max_elm_equal = 1
 
 combines = list(itertools.combinations(list(range(2, row + 1)), col - 1))
 
@@ -34,13 +34,16 @@ def fill_matrix(matrix, combine):
 
 
 def update_matrix(matrix, combine, position):
-    print(position)
     num_rows = len(matrix)
     num_cols = len(matrix[0])
     row = position // num_cols
     col = position % num_cols
 
-    if position > (num_rows - 1) * (num_cols - 1):
+    if col == 0:
+        update_matrix(matrix, combine, position + 1)
+        return
+
+    if position > num_cols*num_rows - 1:
         return
     selectables = set(range(1, num_rows+1))
     selected_in_cols = set([rows[col] for rows in matrix[0:row]])
@@ -59,15 +62,15 @@ def update_matrix(matrix, combine, position):
 
         if valid:
             matrix[row][col] = selectable
-            if position == (num_rows - 1) * (num_cols - 1):
+            if position == num_cols*num_rows - 1:
+                print(matrix)
                 result.append(copy.deepcopy(matrix))
             update_matrix(matrix, combine, position + 1)
             matrix[row][col] = 0
         selected_in_rows.discard(selectable)
 
 
-# for c in combines:
-#     fill_matrix(matrix, combines[0])
-fill_matrix(matrix, combines[0])
+for c in combines:
+    fill_matrix(matrix, combines[0])
 
-print('\n'.join('{}: {}'.format(*k) for k in enumerate(result)))
+# print('\n'.join('{}: {}'.format(*k) for k in enumerate(result)))
